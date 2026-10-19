@@ -328,6 +328,10 @@ BODIES["index.html"] = """
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.8c-.4.2-.6.6-.6 1.1v18.2c0 .5.2.9.6 1.1l10.2-10.2L3.6 1.8zm11.5 8.9L6.9 2.5l10 5.7-1.8 2.5zm3.6 2.6c.7-.5.7-1.7 0-2.2l-2.1-1.2-2 2.3 2 2.3 2.1-1.2zM6.9 21.5l8.2-8.2 1.8 2.5-10 5.7z"/></svg>
         <span>Google Play<small>Download for Android</small></span>
       </a>
+      <a class="store-btn" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.03 3.57 7.4 8.4 8.03.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .88.55 1.08-.46 5.82-3.43 7.94-5.87C21.53 13.53 22 11.9 22 10.13 22 5.64 17.52 2 12 2zM8.6 12.9H6.5a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 1 0v3.3h1.6a.5.5 0 0 1 0 1zm1.9-.5a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 1 0v3.8zm4.5 0a.5.5 0 0 1-.9.3l-1.9-2.6v2.3a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 .9-.3l1.9 2.6V8.6a.5.5 0 0 1 1 0v3.8zm3.3-2.4a.5.5 0 0 1 0 1h-1.6v.9h1.6a.5.5 0 0 1 0 1h-2.1a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 .5-.5h2.1a.5.5 0 0 1 0 1h-1.6v.9h1.6z"/></svg>
+        <span>LINE<small>Book with the team, no app needed</small></span>
+      </a>
     </div></div>
     <p style="margin-top:22px; font-size:.95rem; color:rgba(255,255,255,.8)">Questions first? <a href="contact.html" style="color:var(--white); font-weight:700">Talk to the team</a>.</p>
   </div>
@@ -381,6 +385,10 @@ BODIES["pickleball.html"] = """
       <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://play.google.com/store/apps/details?id=com.krosspadel.bookandgo" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.8c-.4.2-.6.6-.6 1.1v18.2c0 .5.2.9.6 1.1l10.2-10.2L3.6 1.8zm11.5 8.9L6.9 2.5l10 5.7-1.8 2.5zm3.6 2.6c.7-.5.7-1.7 0-2.2l-2.1-1.2-2 2.3 2 2.3 2.1-1.2zM6.9 21.5l8.2-8.2 1.8 2.5-10 5.7z"/></svg>
         <span>Google Play<small>Download for Android</small></span>
+      </a>
+      <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.03 3.57 7.4 8.4 8.03.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .88.55 1.08-.46 5.82-3.43 7.94-5.87C21.53 13.53 22 11.9 22 10.13 22 5.64 17.52 2 12 2zM8.6 12.9H6.5a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 1 0v3.3h1.6a.5.5 0 0 1 0 1zm1.9-.5a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 1 0v3.8zm4.5 0a.5.5 0 0 1-.9.3l-1.9-2.6v2.3a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 .9-.3l1.9 2.6V8.6a.5.5 0 0 1 1 0v3.8zm3.3-2.4a.5.5 0 0 1 0 1h-1.6v.9h1.6a.5.5 0 0 1 0 1h-2.1a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 .5-.5h2.1a.5.5 0 0 1 0 1h-1.6v.9h1.6z"/></svg>
+        <span>LINE<small>Book with the team, no app needed</small></span>
       </a>
     </div></div>
     </div>
@@ -535,6 +543,7 @@ BODIES["classes.html"] = """
         <a class="btn btn-solid" href="index.html#app">Join on the app</a>
       </div>
     </div>
+    <p class="reveal" style="margin-top:18px; font-size:.95rem">Not on the app yet? <a href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener" style="font-weight:700">Message us on LINE</a> and we set you up.</p>
     <div class="card reveal" style="margin-top:22px">
       <span class="tag">Member perks</span>
       <p>Every month: 2 ice bath sessions, 1 pickleball session (full court, event or open match) and 1 free event. Plus 20% off merchandising and drinks, always.</p>
@@ -579,7 +588,7 @@ BODIES["training.html"] = """
       <p class="lead" style="margin-top:16px">Every PT journey at KROSS PARK starts with an assessment. Your coach maps where you are, where you want to be, and builds the program that gets you there.</p>
       <p style="margin-top:16px; max-width:34em">Sessions run 1:1 or as a duo in our indoor studio, built for focused work, with the rooftop strength park and ice bath available when your program calls for them. Strength, fat loss, HYROX prep, return from injury, sport specific work. Whatever the goal, it gets a plan.</p>
       <div style="margin-top:26px">
-        <a class="btn btn-green" href="contact.html">Book your assessment</a>
+        <a class="btn btn-green" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">Book your assessment on LINE</a>
       </div>
     </div>
     <div class="split-media">
@@ -633,6 +642,10 @@ BODIES["training.html"] = """
       <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://play.google.com/store/apps/details?id=com.krosspadel.bookandgo" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.8c-.4.2-.6.6-.6 1.1v18.2c0 .5.2.9.6 1.1l10.2-10.2L3.6 1.8zm11.5 8.9L6.9 2.5l10 5.7-1.8 2.5zm3.6 2.6c.7-.5.7-1.7 0-2.2l-2.1-1.2-2 2.3 2 2.3 2.1-1.2zM6.9 21.5l8.2-8.2 1.8 2.5-10 5.7z"/></svg>
         <span>Google Play<small>Download for Android</small></span>
+      </a>
+      <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.03 3.57 7.4 8.4 8.03.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .88.55 1.08-.46 5.82-3.43 7.94-5.87C21.53 13.53 22 11.9 22 10.13 22 5.64 17.52 2 12 2zM8.6 12.9H6.5a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 1 0v3.3h1.6a.5.5 0 0 1 0 1zm1.9-.5a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 1 0v3.8zm4.5 0a.5.5 0 0 1-.9.3l-1.9-2.6v2.3a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 .9-.3l1.9 2.6V8.6a.5.5 0 0 1 1 0v3.8zm3.3-2.4a.5.5 0 0 1 0 1h-1.6v.9h1.6a.5.5 0 0 1 0 1h-2.1a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 .5-.5h2.1a.5.5 0 0 1 0 1h-1.6v.9h1.6z"/></svg>
+        <span>LINE<small>Book with the team, no app needed</small></span>
       </a>
     </div></div>
     </div>
@@ -757,6 +770,10 @@ BODIES["contact.html"] = """
       <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://play.google.com/store/apps/details?id=com.krosspadel.bookandgo" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.8c-.4.2-.6.6-.6 1.1v18.2c0 .5.2.9.6 1.1l10.2-10.2L3.6 1.8zm11.5 8.9L6.9 2.5l10 5.7-1.8 2.5zm3.6 2.6c.7-.5.7-1.7 0-2.2l-2.1-1.2-2 2.3 2 2.3 2.1-1.2zM6.9 21.5l8.2-8.2 1.8 2.5-10 5.7z"/></svg>
         <span>Google Play<small>Download for Android</small></span>
+      </a>
+      <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.03 3.57 7.4 8.4 8.03.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .88.55 1.08-.46 5.82-3.43 7.94-5.87C21.53 13.53 22 11.9 22 10.13 22 5.64 17.52 2 12 2zM8.6 12.9H6.5a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 1 0v3.3h1.6a.5.5 0 0 1 0 1zm1.9-.5a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 1 0v3.8zm4.5 0a.5.5 0 0 1-.9.3l-1.9-2.6v2.3a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 .9-.3l1.9 2.6V8.6a.5.5 0 0 1 1 0v3.8zm3.3-2.4a.5.5 0 0 1 0 1h-1.6v.9h1.6a.5.5 0 0 1 0 1h-2.1a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 .5-.5h2.1a.5.5 0 0 1 0 1h-1.6v.9h1.6z"/></svg>
+        <span>LINE<small>Book with the team, no app needed</small></span>
       </a>
     </div></div>
       </div>
