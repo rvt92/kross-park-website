@@ -201,8 +201,8 @@ BODIES["index.html"] = """
     <h1>Train above<br>the city</h1>
     <p class="lead">Sunset pickleball, sleds against the skyline, and an ice bath waiting when you have earned it. Eight floors above the noise, this is training the way Bangkok has never seen it.</p>
     <div class="hero-ctas">
+      <a class="btn btn-solid" href="classes.html">Explore group classes</a>
       <a class="btn btn-solid" href="pickleball.html">Book the court</a>
-      <a class="btn btn-outline" href="classes.html">Explore classes</a>
     </div>
     <div class="hero-meta courtline light">
       <div>Pickleball</div>
