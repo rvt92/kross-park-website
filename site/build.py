@@ -38,7 +38,10 @@ GA_ID = "G-YN3RY665Y2"
 # Only set these if you create a conversion action directly in Google Ads instead:
 # ADS_ID = "AW-123456789", ADS_LEAD_LABEL = "AbCdEfGhIj" (the label Google shows for the action).
 ADS_ID = "AW-18523916986"
-ADS_LEAD_LABEL = ""
+# The Ads account has an event-based conversion action named submit_lead_form (primary goal of the
+# Performance Max campaign). Contact clicks and form submits send that event to the Ads tag.
+ADS_LEAD_EVENT = "submit_lead_form"
+ADS_LEAD_LABEL = ""   # only for a classic conversion action with an AW-xxx/LABEL snippet
 
 
 def ga_head():
@@ -56,8 +59,13 @@ ICONS = """<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favi
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">"""
 
 def track_js():
-    conv = (f"if(lead) gtag('event','conversion',{{send_to:'{ADS_ID}/{ADS_LEAD_LABEL}'}});"
-            if ADS_ID and ADS_LEAD_LABEL else "")
+    if ADS_ID and ADS_LEAD_LABEL:
+        conv = f"gtag('event','conversion',{{send_to:'{ADS_ID}/{ADS_LEAD_LABEL}'}});"
+    elif ADS_ID and ADS_LEAD_EVENT:
+        conv = f"gtag('event','{ADS_LEAD_EVENT}',{{send_to:'{ADS_ID}'}});"
+    else:
+        conv = ""
+    lead_conv = f"if(lead) {conv}" if conv else ""
     return f"""
 document.addEventListener('click', function(e){{
   var a = e.target.closest('a'); if(!a || typeof gtag !== 'function') return;
@@ -69,10 +77,10 @@ document.addEventListener('click', function(e){{
   else if(h.indexOf('wa.me') > -1) gtag('event','contact_click',{{channel:'whatsapp'}});
   else if(h.indexOf('mailto:') === 0) gtag('event','contact_click',{{channel:'email'}});
   else lead = false;
-  {conv}
+  {lead_conv}
 }});
 var enq = document.querySelector('form.enquiry');
-if(enq) enq.addEventListener('submit', function(){{ if(typeof gtag === 'function') gtag('event','generate_lead',{{form:'enquiry'}}); }});
+if(enq) enq.addEventListener('submit', function(){{ if(typeof gtag === 'function') {{ gtag('event','generate_lead',{{form:'enquiry'}}); {conv} }} }});
 """
 
 SCHEMA = """<script type="application/ld+json">
