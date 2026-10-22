@@ -26,7 +26,7 @@ gtag('config', 'G-YN3RY665Y2');
 gtag('config', 'AW-18523916986');
 </script>
 
-<link rel="stylesheet" href="assets/styles.css?v=b236fd44">
+<link rel="stylesheet" href="assets/styles.css?v=f2630291">
 </head>
 <body>
 
@@ -200,7 +200,21 @@ document.addEventListener('click', function(e){
   if(lead) gtag('event','submit_lead_form',{send_to:'AW-18523916986'});
 });
 var enq = document.querySelector('form.enquiry');
-if(enq) enq.addEventListener('submit', function(){ if(typeof gtag === 'function') { gtag('event','generate_lead',{form:'enquiry'}); gtag('event','submit_lead_form',{send_to:'AW-18523916986'}); } });
+if(enq) enq.addEventListener('submit', function(e){
+  if(typeof gtag === 'function') { gtag('event','generate_lead',{form:'enquiry'}); gtag('event','submit_lead_form',{send_to:'AW-18523916986'}); }
+  if(!window.fetch) return;  // old browser: normal submit, lands on /thanks
+  e.preventDefault();
+  var btn = enq.querySelector('button[type=submit]'), err = document.getElementById('formError');
+  btn.disabled = true; btn.textContent = 'Sending...'; err.hidden = true;
+  fetch(enq.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {
+    method: 'POST', body: new FormData(enq), headers: {'Accept': 'application/json'}
+  }).then(function(r){ return r.json(); }).then(function(d){
+    if(!d || String(d.success) !== 'true') throw new Error(d && d.message);
+    enq.reset(); enq.hidden = true; document.getElementById('formOk').hidden = false;
+  }).catch(function(){
+    btn.disabled = false; btn.textContent = 'Send message'; err.hidden = false;
+  });
+});
 
 </script>
 </body>

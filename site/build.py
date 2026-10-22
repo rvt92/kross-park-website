@@ -80,7 +80,21 @@ document.addEventListener('click', function(e){{
   {lead_conv}
 }});
 var enq = document.querySelector('form.enquiry');
-if(enq) enq.addEventListener('submit', function(){{ if(typeof gtag === 'function') {{ gtag('event','generate_lead',{{form:'enquiry'}}); {conv} }} }});
+if(enq) enq.addEventListener('submit', function(e){{
+  if(typeof gtag === 'function') {{ gtag('event','generate_lead',{{form:'enquiry'}}); {conv} }}
+  if(!window.fetch) return;  // old browser: normal submit, lands on /thanks
+  e.preventDefault();
+  var btn = enq.querySelector('button[type=submit]'), err = document.getElementById('formError');
+  btn.disabled = true; btn.textContent = 'Sending...'; err.hidden = true;
+  fetch(enq.action.replace('formsubmit.co/', 'formsubmit.co/ajax/'), {{
+    method: 'POST', body: new FormData(enq), headers: {{'Accept': 'application/json'}}
+  }}).then(function(r){{ return r.json(); }}).then(function(d){{
+    if(!d || String(d.success) !== 'true') throw new Error(d && d.message);
+    enq.reset(); enq.hidden = true; document.getElementById('formOk').hidden = false;
+  }}).catch(function(){{
+    btn.disabled = false; btn.textContent = 'Send message'; err.hidden = false;
+  }});
+}});
 """
 
 SCHEMA = """<script type="application/ld+json">
@@ -799,7 +813,13 @@ BODIES["contact.html"] = """
           <textarea id="f-message" name="message" rows="5" required></textarea>
         </div>
         <button class="btn btn-green" type="submit">Send message</button>
+        <p class="form-note" id="formError" hidden>Something went wrong. Please try again, or message us on LINE.</p>
       </form>
+      <div class="form-ok" id="formOk" hidden>
+        <span class="eyebrow" style="color:var(--forest-700)">Message received</span>
+        <h3 style="margin-top:12px">Got it. Talk soon.</h3>
+        <p style="margin-top:10px">We reply by email, usually within a day. Need an answer faster? <a href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener" style="font-weight:700">LINE @krosspark</a> is the quickest way to reach the team.</p>
+      </div>
     </div>
     <div class="contact-channels reveal">
       <div class="channel">

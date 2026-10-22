@@ -432,3 +432,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--sage); outline-
   }
   .lp-sticky .btn { flex: 1; text-align: center; padding: 14px 10px; font-size: .78rem; }
 }
+
+/* ---------- enquiry form: inline confirmation ---------- */
+.form-note { font-size: .92rem; font-weight: 700; color: #a3362b; }
+.form-ok { background: var(--white); border-top: 3px solid var(--forest-700); padding: 32px 28px; max-width: 34em; }
+.form-ok p { font-size: 1rem; }
+[hidden] { display: none !important; }
