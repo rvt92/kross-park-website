@@ -761,6 +761,7 @@ BODIES["contact.html"] = """
         <input type="hidden" name="_subject" value="KROSS PARK website enquiry">
         <input type="hidden" name="_template" value="table">
         <input type="hidden" name="_next" value="https://krosspark.club/thanks">
+        <input type="hidden" name="_captcha" value="false">
         <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
         <div class="field">
           <label for="f-name">Name</label>
