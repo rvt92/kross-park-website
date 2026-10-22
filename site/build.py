@@ -37,7 +37,7 @@ GA_ID = "G-YN3RY665Y2"
 # (contact_click, app_download_click, generate_lead) as conversions inside Google Ads.
 # Only set these if you create a conversion action directly in Google Ads instead:
 # ADS_ID = "AW-123456789", ADS_LEAD_LABEL = "AbCdEfGhIj" (the label Google shows for the action).
-ADS_ID = ""
+ADS_ID = "AW-18523916986"
 ADS_LEAD_LABEL = ""
 
 
