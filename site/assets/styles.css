@@ -87,7 +87,7 @@ p.lead { font-size: clamp(1.1rem, 1.8vw, 1.35rem); font-weight: 400; max-width: 
 }
 .logo span { font-weight: 400; letter-spacing: .18em; }
 .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-.nav-links a {
+.nav-links a { white-space: nowrap;
   text-decoration: none; font-size: .82rem; font-weight: 700;
   text-transform: uppercase; letter-spacing: .14em; opacity: .85;
 }
@@ -120,7 +120,7 @@ p.lead { font-size: clamp(1.1rem, 1.8vw, 1.35rem); font-weight: 400; max-width: 
 .nav-toggle { display: none; background: none; border: 0; color: var(--white); cursor: pointer; }
 .nav-toggle svg { width: 30px; height: 30px; }
 
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .nav-toggle { display: block; }
   .nav-line { display: inline-flex; margin-right: 12px; padding: 8px 12px; }
   .nav-line span { display: none; }
