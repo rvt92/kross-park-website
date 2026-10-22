@@ -1,5 +1,0 @@
-# Netlify reads this from the repo root when the repo is linked.
-# The site is pre-built static HTML committed to the repo, so there is no build command.
-# Regenerate pages locally with `python site/build.py` before committing.
-[build]
-  publish = "site"

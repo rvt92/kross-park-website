@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pickleball Court | KROSS PARK Bangkok</title>
 <meta name="description" content="Book Bangkok's rooftop pickleball court at KROSS PARK on the KROSS App. Retractable roof, coaching available, ice bath recovery.">
+
 <link rel="canonical" href="https://krosspark.club/pickleball">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KROSS PARK">
@@ -24,26 +25,26 @@ gtag('js', new Date());
 gtag('config', 'G-YN3RY665Y2');
 </script>
 
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/styles.css?v=6be04609">
 </head>
 <body>
 
 <header class="site-header" id="siteHeader">
   <nav class="nav">
-    <a class="logo" href="index.html"><img src="assets/img/logo-white.png" alt="KROSS PARK"></a>
+    <a class="logo" href="/"><img src="assets/img/logo-white.png" alt="KROSS PARK"></a>
     <a class="nav-line" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.03 3.57 7.4 8.4 8.03.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .88.55 1.08-.46 5.82-3.43 7.94-5.87C21.53 13.53 22 11.9 22 10.13 22 5.64 17.52 2 12 2zM8.6 12.9H6.5a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 1 0v3.3h1.6a.5.5 0 0 1 0 1zm1.9-.5a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 1 0v3.8zm4.5 0a.5.5 0 0 1-.9.3l-1.9-2.6v2.3a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 .9-.3l1.9 2.6V8.6a.5.5 0 0 1 1 0v3.8zm3.3-2.4a.5.5 0 0 1 0 1h-1.6v.9h1.6a.5.5 0 0 1 0 1h-2.1a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 .5-.5h2.1a.5.5 0 0 1 0 1h-1.6v.9h1.6z"/></svg><span>LINE OA</span></a>
     <button class="nav-toggle" aria-label="Open menu" onclick="document.getElementById('navLinks').classList.toggle('open')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
     </button>
     <ul class="nav-links" id="navLinks">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="pickleball.html" aria-current="page">Pickleball</a></li>
-          <li><a href="classes.html">Classes</a></li>
-          <li><a href="training.html">Personal Training</a></li>
-          <li><a href="events.html">Events</a></li>
-          <li><a href="contact.html">Contact</a></li>
+          <li><a href="/">Home</a></li>
+          <li><a href="/pickleball" aria-current="page">Pickleball</a></li>
+          <li><a href="/classes">Classes</a></li>
+          <li><a href="/training">Personal Training</a></li>
+          <li><a href="/events">Events</a></li>
+          <li><a href="/contact">Contact</a></li>
           <li class="nav-line-item"><a class="nav-cta nav-cta-line" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">LINE OA</a></li>
-          <li><a class="nav-cta" href="index.html#app">Get the App</a></li>
+          <li><a class="nav-cta" href="/#app">Get the App</a></li>
     </ul>
   </nav>
 </header>
@@ -125,16 +126,16 @@ gtag('config', 'G-YN3RY665Y2');
   <div class="wrap">
     <div class="footer-grid">
       <div class="footer-col">
-        <a class="logo" href="index.html"><img src="assets/img/logo-white.png" alt="KROSS PARK"></a>
+        <a class="logo" href="/"><img src="assets/img/logo-white.png" alt="KROSS PARK"></a>
         <p style="margin-top:14px">Rooftop training club in Phrom Phong, Bangkok. Pickleball, strength, recovery and coaching, above the city.</p>
       </div>
       <div class="footer-col">
         <h4>Explore</h4>
         <ul>
-          <li><a href="pickleball.html">Pickleball</a></li>
-          <li><a href="classes.html">Classes</a></li>
-          <li><a href="training.html">Personal Training</a></li>
-          <li><a href="events.html">Events</a></li>
+          <li><a href="/pickleball">Pickleball</a></li>
+          <li><a href="/classes">Classes</a></li>
+          <li><a href="/training">Personal Training</a></li>
+          <li><a href="/events">Events</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -162,7 +163,7 @@ gtag('config', 'G-YN3RY665Y2');
     </div>
     <div class="footer-bottom">
       <span>© 2026 KROSS PARK. Part of the KROSS family.</span>
-      <span>Rooftop training club, Bangkok</span>
+      <span>Rooftop training club, Bangkok · <a href="/privacy">Privacy</a></span>
     </div>
   </div>
 </footer>
@@ -176,13 +177,15 @@ document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
 document.addEventListener('click', function(e){
   var a = e.target.closest('a'); if(!a || typeof gtag !== 'function') return;
-  var h = a.href || '';
+  var h = a.href || '', lead = true;
   if(h.indexOf('apps.apple.com') > -1) gtag('event','app_download_click',{platform:'ios'});
   else if(h.indexOf('play.google.com') > -1) gtag('event','app_download_click',{platform:'android'});
-  else if(h.indexOf('chat.whatsapp.com') > -1) gtag('event','community_join_click',{});
+  else if(h.indexOf('chat.whatsapp.com') > -1) { lead = false; gtag('event','community_join_click',{}); }
   else if(h.indexOf('line.me') > -1) gtag('event','contact_click',{channel:'line'});
   else if(h.indexOf('wa.me') > -1) gtag('event','contact_click',{channel:'whatsapp'});
   else if(h.indexOf('mailto:') === 0) gtag('event','contact_click',{channel:'email'});
+  else lead = false;
+  
 });
 var enq = document.querySelector('form.enquiry');
 if(enq) enq.addEventListener('submit', function(){ if(typeof gtag === 'function') gtag('event','generate_lead',{form:'enquiry'}); });

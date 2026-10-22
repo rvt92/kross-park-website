@@ -1,0 +1,7 @@
+.git
+.netlify
+site/.netlify
+site/build.py
+site/README.md
+site/__pycache__
+*.md

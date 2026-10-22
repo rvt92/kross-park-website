@@ -381,3 +381,54 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--sage); outline-
 /* ---------- expandable class grid ---------- */
 .cards .hidden-class { display: none; }
 .cards.expanded .hidden-class { display: flex; }
+
+
+/* ============================================================
+   Campaign landing pages (/go/*). No nav, one job: get the click.
+   ============================================================ */
+.lp-header { position: absolute; top: 0; left: 0; right: 0; z-index: 50; }
+.lp-header .nav { padding-top: 20px; }
+.lp-header .nav-cta { text-decoration: none; font-size: .78rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 8px; }
+.lp-header .nav-cta svg { width: 16px; height: 16px; }
+
+.lp-hero { min-height: 80svh; }
+.lp-hero .hero-inner { padding-top: 120px; }
+.lp-hero h1 { font-size: clamp(2.5rem, 7vw, 5.2rem); max-width: 11em; }
+.lp-hero p.lead { max-width: 30em; }
+
+.proof { display: grid; gap: 2px; grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 720px) { .proof { grid-template-columns: 1fr; } }
+.proof div { background: var(--white); padding: 28px 26px 30px; border-top: 3px solid var(--forest-700); }
+.proof strong { display: block; font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 900; text-transform: uppercase; line-height: 1; letter-spacing: .01em; }
+.proof span { display: block; margin-top: 10px; font-size: .95rem; }
+
+.wa-btn { display: inline-flex; align-items: center; gap: 10px; }
+.wa-btn svg { width: 18px; height: 18px; flex: none; }
+
+.faq { display: flex; flex-direction: column; gap: 2px; max-width: 760px; }
+.faq details { background: var(--white); border-top: 3px solid var(--forest-700); }
+.faq summary {
+  cursor: pointer; list-style: none; padding: 20px 24px;
+  font-weight: 800; font-size: 1.05rem; display: flex; justify-content: space-between; align-items: center; gap: 16px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-weight: 900; font-size: 1.3rem; color: var(--forest-600); flex: none; }
+.faq details[open] summary::after { content: "\2013"; }
+.faq details p { padding: 0 24px 22px; max-width: 42em; }
+
+.lp-footer { background: var(--forest-950); color: rgba(255,255,255,.72); padding: 36px 0; font-size: .88rem; }
+.lp-footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 32px; }
+.lp-footer a { color: inherit; text-decoration: none; }
+.lp-footer a:hover { color: var(--white); }
+
+/* sticky CTA bar on phones only */
+.lp-sticky { display: none; }
+@media (max-width: 860px) {
+  body.landing { padding-bottom: 76px; }
+  .lp-sticky {
+    display: flex; gap: 8px; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--forest-950);
+    box-shadow: 0 -1px 0 rgba(255,255,255,.12);
+  }
+  .lp-sticky .btn { flex: 1; text-align: center; padding: 14px 10px; font-size: .78rem; }
+}

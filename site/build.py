@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 """Generates the KROSS PARK static pages with a shared shell.
-Edit page content below, run `python3 build.py`, done."""
+Edit page content below, run `python build.py` (from any directory), done.
+Output: the six site pages, privacy/thanks/404, and the Google Ads landing pages in go/."""
+
+import hashlib, pathlib, re, urllib.parse
+
+HERE = pathlib.Path(__file__).resolve().parent
+# Content hash of the stylesheet, appended as ?v= so nginx can cache assets for a year safely.
+CSS_VER = hashlib.md5((HERE / "assets" / "styles.css").read_bytes()).hexdigest()[:8]
 
 PAGES = {
     "index.html":      ("Home", "KROSS PARK | Rooftop Fitness &amp; Pickleball in Phrom Phong, Bangkok"),
@@ -9,7 +16,11 @@ PAGES = {
     "training.html":   ("Personal Training", "1:1 Personal Training | KROSS PARK Bangkok"),
     "events.html":     ("Events", "Rooftop Events & Venue Hire | KROSS PARK Bangkok"),
     "contact.html":    ("Contact", "Contact & Location | KROSS PARK Bangkok"),
+    "privacy.html":    ("Privacy", "Privacy Policy | KROSS PARK Bangkok"),
+    "thanks.html":     ("Thanks", "Message received | KROSS PARK Bangkok"),
+    "404.html":        ("Not found", "Page not found | KROSS PARK Bangkok"),
 }
+NOINDEX = {"thanks.html", "404.html"}
 
 NAV_ITEMS = [
     ("index.html", "Home"),
@@ -21,31 +32,47 @@ NAV_ITEMS = [
 ]
 
 
-GA_HEAD = """<script async src="https://www.googletagmanager.com/gtag/js?id=G-YN3RY665Y2"></script>
+GA_ID = "G-YN3RY665Y2"
+# Google Ads conversion tracking. Default: leave both empty and import the GA4 events
+# (contact_click, app_download_click, generate_lead) as conversions inside Google Ads.
+# Only set these if you create a conversion action directly in Google Ads instead:
+# ADS_ID = "AW-123456789", ADS_LEAD_LABEL = "AbCdEfGhIj" (the label Google shows for the action).
+ADS_ID = ""
+ADS_LEAD_LABEL = ""
+
+
+def ga_head():
+    ads = f"\ngtag('config', '{ADS_ID}');" if ADS_ID else ""
+    return f"""<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
+function gtag(){{dataLayer.push(arguments);}}
 gtag('js', new Date());
-gtag('config', 'G-YN3RY665Y2');
+gtag('config', '{GA_ID}');{ads}
 </script>"""
 
 ICONS = """<link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="assets/img/favicon-192.png">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">"""
 
-TRACK_JS = """
-document.addEventListener('click', function(e){
+def track_js():
+    conv = (f"if(lead) gtag('event','conversion',{{send_to:'{ADS_ID}/{ADS_LEAD_LABEL}'}});"
+            if ADS_ID and ADS_LEAD_LABEL else "")
+    return f"""
+document.addEventListener('click', function(e){{
   var a = e.target.closest('a'); if(!a || typeof gtag !== 'function') return;
-  var h = a.href || '';
-  if(h.indexOf('apps.apple.com') > -1) gtag('event','app_download_click',{platform:'ios'});
-  else if(h.indexOf('play.google.com') > -1) gtag('event','app_download_click',{platform:'android'});
-  else if(h.indexOf('chat.whatsapp.com') > -1) gtag('event','community_join_click',{});
-  else if(h.indexOf('line.me') > -1) gtag('event','contact_click',{channel:'line'});
-  else if(h.indexOf('wa.me') > -1) gtag('event','contact_click',{channel:'whatsapp'});
-  else if(h.indexOf('mailto:') === 0) gtag('event','contact_click',{channel:'email'});
-});
+  var h = a.href || '', lead = true;
+  if(h.indexOf('apps.apple.com') > -1) gtag('event','app_download_click',{{platform:'ios'}});
+  else if(h.indexOf('play.google.com') > -1) gtag('event','app_download_click',{{platform:'android'}});
+  else if(h.indexOf('chat.whatsapp.com') > -1) {{ lead = false; gtag('event','community_join_click',{{}}); }}
+  else if(h.indexOf('line.me') > -1) gtag('event','contact_click',{{channel:'line'}});
+  else if(h.indexOf('wa.me') > -1) gtag('event','contact_click',{{channel:'whatsapp'}});
+  else if(h.indexOf('mailto:') === 0) gtag('event','contact_click',{{channel:'email'}});
+  else lead = false;
+  {conv}
+}});
 var enq = document.querySelector('form.enquiry');
-if(enq) enq.addEventListener('submit', function(){ if(typeof gtag === 'function') gtag('event','generate_lead',{form:'enquiry'}); });
+if(enq) enq.addEventListener('submit', function(){{ if(typeof gtag === 'function') gtag('event','generate_lead',{{form:'enquiry'}}); }});
 """
 
 SCHEMA = """<script type="application/ld+json">
@@ -91,6 +118,7 @@ def shell(page, title, body, desc):
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
 <meta name="description" content="{desc}">
+{'<meta name="robots" content="noindex">' if page in NOINDEX else ''}
 <link rel="canonical" href="{'https://krosspark.club/' + ('' if page == 'index.html' else page[:-5])}">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KROSS PARK">
@@ -100,9 +128,9 @@ def shell(page, title, body, desc):
 <meta property="og:image" content="https://krosspark.club/assets/img/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 {ICONS}
-{GA_HEAD}
+{ga_head()}
 {SCHEMA if page == 'index.html' else ''}
-<link rel="stylesheet" href="assets/styles.css">
+<link rel="stylesheet" href="assets/styles.css?v={CSS_VER}">
 </head>
 <body>
 
@@ -166,7 +194,7 @@ def shell(page, title, body, desc):
     </div>
     <div class="footer-bottom">
       <span>© 2026 KROSS PARK. Part of the KROSS family.</span>
-      <span>Rooftop training club, Bangkok</span>
+      <span>Rooftop training club, Bangkok · <a href="privacy.html">Privacy</a></span>
     </div>
   </div>
 </footer>
@@ -177,13 +205,11 @@ addEventListener('scroll', () => header.classList.toggle('scrolled', scrollY > 4
 if (location.pathname.split('/').pop() !== 'index.html' && location.pathname.split('/').pop() !== '') header.classList.add('scrolled');
 const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {{threshold:.12}});
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-{TRACK_JS}
+{track_js()}
 </script>
 </body>
 </html>
 """
-
-import pathlib, re
 
 def esc_braces(s):  # body content is plain, only the shell uses f-string
     return s
@@ -729,10 +755,13 @@ BODIES["contact.html"] = """
     <div class="reveal">
       <span class="eyebrow" style="color:var(--forest-700)">Enquiry form</span>
       <h2 style="margin:14px 0 26px">Send us a message</h2>
-      <!-- Netlify Forms: works automatically once deployed on Netlify. Submissions land in your Netlify dashboard and can be forwarded to email under Site settings, Forms, Notifications. -->
-      <form class="enquiry" name="enquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field">
-        <input type="hidden" name="form-name" value="enquiry">
-        <p style="display:none"><label>Leave this empty: <input name="bot-field"></label></p>
+      <!-- FormSubmit (formsubmit.co) posts the form straight to the inbox, no backend needed.
+           The first submission sends a one-time activation email to krosspark2026@gmail.com; confirm it once. -->
+      <form class="enquiry" name="enquiry" method="POST" action="https://formsubmit.co/krosspark2026@gmail.com">
+        <input type="hidden" name="_subject" value="KROSS PARK website enquiry">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" value="https://krosspark.club/thanks">
+        <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
         <div class="field">
           <label for="f-name">Name</label>
           <input id="f-name" name="name" type="text" required>
@@ -817,6 +846,323 @@ BODIES["contact.html"] = """
 </section>
 """
 
+BODIES["privacy.html"] = """
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Privacy</span>
+    <h1>Privacy<br>policy</h1>
+    <p class="lead">What we collect on krosspark.club, why, and how to reach us about it. Last updated 22 October 2026.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" style="max-width:820px">
+    <h3>Who we are</h3>
+    <p style="margin:10px 0 28px">KROSS PARK, 5/9 Soi Phrom Si 1, Khlong Tan Nuea, Watthana, Bangkok 10110, Thailand. Email <a href="mailto:krosspark2026@gmail.com">krosspark2026@gmail.com</a>.</p>
+
+    <h3>Enquiry form</h3>
+    <p style="margin:10px 0 28px">When you send the form on our contact page we receive your name, email, phone number if you give it, what you are interested in and your message. The form is delivered by FormSubmit (formsubmit.co), which passes it to our inbox. We use it only to answer you. We do not sell or share it.</p>
+
+    <h3>Analytics and advertising</h3>
+    <p style="margin:10px 0 28px">We use Google Analytics 4 to understand how the site is used, and Google Ads to measure whether our ads lead to a visit, a message or an app download. Both set cookies and record your approximate location, device and pages viewed. Google's own privacy policy applies to that data. You can block these cookies in your browser or with the <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics opt-out add-on</a>.</p>
+
+    <h3>Third parties on the page</h3>
+    <p style="margin:10px 0 28px">The map on the contact page is embedded from Google Maps. Links to the KROSS App, LINE, WhatsApp and Instagram take you to those services, each with its own privacy policy. Bookings and payments happen in the KROSS App, not on this site.</p>
+
+    <h3>Your rights</h3>
+    <p style="margin:10px 0 28px">Under Thailand's Personal Data Protection Act you can ask what we hold about you, ask us to correct it, or ask us to delete it. Email <a href="mailto:krosspark2026@gmail.com">krosspark2026@gmail.com</a> and we handle it.</p>
+  </div>
+</section>
+"""
+
+BODIES["thanks.html"] = """
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">Message received</span>
+    <h1>Got it.<br>Talk soon.</h1>
+    <p class="lead">Your message is in our inbox. We reply by email, usually within a day. Need an answer faster? LINE is the quickest way to reach the team.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-solid" href="https://line.me/R/ti/p/@531jlxud" target="_blank" rel="noopener">LINE @krosspark</a>
+      <a class="btn btn-outline" href="index.html">Back to the site</a>
+    </div>
+  </div>
+</section>
+"""
+
+BODIES["404.html"] = """
+<section class="page-hero">
+  <div class="wrap">
+    <span class="eyebrow">404</span>
+    <h1>Nothing<br>up here</h1>
+    <p class="lead">That page does not exist or has moved. The rooftop is still where it always was.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-solid" href="index.html">Home</a>
+      <a class="btn btn-outline" href="pickleball.html">Pickleball</a>
+      <a class="btn btn-outline" href="classes.html">Classes</a>
+      <a class="btn btn-outline" href="training.html">Personal training</a>
+    </div>
+  </div>
+</section>
+"""
+
+
+# ============================================================
+# Google Ads landing pages: krosspark.club/go/<slug>
+# One per ad group. No navigation, one offer, LINE as the primary action, WhatsApp second.
+# noindex so they never compete with the organic pages. Edit copy here only.
+# ============================================================
+
+WA_NUMBER = "66925726448"
+LINE_URL = "https://line.me/R/ti/p/@531jlxud"
+MAPS_URL = "https://www.google.com/maps?q=5/9+Soi+Phrom+Si+1,+Khlong+Tan+Nuea,+Watthana,+Bangkok+10110"
+LINE_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.48 2 2 5.64 2 10.13c0 4.03 3.57 7.4 8.4 8.03.33.07.77.22.88.5.1.26.07.66.03.92l-.14.86c-.04.26-.2 1 .88.55 1.08-.46 5.82-3.43 7.94-5.87C21.53 13.53 22 11.9 22 10.13 22 5.64 17.52 2 12 2zM8.6 12.9H6.5a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 1 0v3.3h1.6a.5.5 0 0 1 0 1zm1.9-.5a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 1 0v3.8zm4.5 0a.5.5 0 0 1-.9.3l-1.9-2.6v2.3a.5.5 0 0 1-1 0V8.6a.5.5 0 0 1 .9-.3l1.9 2.6V8.6a.5.5 0 0 1 1 0v3.8zm3.3-2.4a.5.5 0 0 1 0 1h-1.6v.9h1.6a.5.5 0 0 1 0 1h-2.1a.5.5 0 0 1-.5-.5V8.6a.5.5 0 0 1 .5-.5h2.1a.5.5 0 0 1 0 1h-1.6v.9h1.6z"/></svg>'
+WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.2 22l5.2-1.4A9.8 9.8 0 1 0 12 2.2zm0 1.7a8.1 8.1 0 1 1-4.1 15.1l-.3-.2-3.1.8.8-3-.2-.3A8.1 8.1 0 0 1 12 3.9zM8.9 7.3c-.2 0-.5.1-.7.3-.3.3-1 1-1 2.4s1 2.8 1.2 3c.1.2 2 3.2 5 4.4 2.5 1 3 .8 3.5.7.5 0 1.7-.7 1.9-1.4.2-.7.2-1.3.2-1.4-.1-.1-.2-.2-.5-.3l-1.9-.9c-.3-.1-.5-.1-.6.1l-.9 1.1c-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.8-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5.3-.5c.1-.2 0-.4 0-.5l-.9-2c-.2-.5-.4-.5-.6-.5h-.5z"/></svg>'
+
+STORE_BTNS = """<div class="store-btns">
+      <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://apps.apple.com/us/app/kross-padel/id6741785490" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.08zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        <span>App Store<small>Download for iOS</small></span>
+      </a>
+      <a class="store-btn" style="background:var(--forest-700); color:var(--white)" href="https://play.google.com/store/apps/details?id=com.krosspadel.bookandgo" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.6 1.8c-.4.2-.6.6-.6 1.1v18.2c0 .5.2.9.6 1.1l10.2-10.2L3.6 1.8zm11.5 8.9L6.9 2.5l10 5.7-1.8 2.5zm3.6 2.6c.7-.5.7-1.7 0-2.2l-2.1-1.2-2 2.3 2 2.3 2.1-1.2zM6.9 21.5l8.2-8.2 1.8 2.5-10 5.7z"/></svg>
+        <span>Google Play<small>Download for Android</small></span>
+      </a>
+    </div>"""
+
+LANDINGS = {
+    "pickleball": dict(
+        title="Rooftop Pickleball Court in Phrom Phong | KROSS PARK Bangkok",
+        desc="Book a rooftop pickleball court in Phrom Phong, Bangkok. ฿800 per hour flat, retractable roof, rackets to rent, coaching available. Open daily 08:00 to 22:00.",
+        eyebrow="Pickleball · Phrom Phong, Bangkok",
+        h1="Rooftop pickleball in Phrom Phong",
+        lead="A dedicated rooftop court with a retractable roof for sun and light rain. ฿800 an hour, flat, any time of day. Rackets at the park, coaching if you want it.",
+        image="court.jpg",
+        alt="KROSS PARK rooftop pickleball court at night under the retractable roof",
+        meta=["Retractable roof", "Rackets to rent", "Ice bath", "Daily 08:00 to 22:00"],
+        proof=[
+            ("฿800 / hour", "Flat rate. No peak pricing."),
+            ("Retractable roof", "Shade from the sun, cover from light rain."),
+            ("08:00 to 22:00", "Open every day. Book by the hour."),
+        ],
+        rates_title="Court rates",
+        rates=[
+            ("Court hire, 1 hour", "฿800"),
+            ("1:1 coaching, 1 hour", "฿1,500"),
+            ("Extra player in a coached session", "฿200 per player"),
+            ("Racket rental", "฿100"),
+            ("Ice bath session", "฿500 per person"),
+        ],
+        book_note="Book your hour on the KROSS App, or message us on LINE or WhatsApp and we do it for you.",
+        secondary=("#book", "Book on the app"),
+        faq=[
+            ("How do I book?", "Download the KROSS App, pick KROSS PARK, choose your hour and confirm. Or message us on LINE or WhatsApp and we book it for you."),
+            ("I have never played. Can I still come?", "Yes. Pickleball is quick to pick up. Rent rackets at the park for ฿100, or book a 1:1 coaching hour for ฿1,500 and add friends at ฿200 each."),
+            ("What about the heat and the rain?", "The roof closes over the court for sun and light rain, so most bookings run exactly as planned."),
+            ("Where are you?", "5/9 Soi Phrom Si 1, Khlong Tan Nuea, Watthana, Bangkok 10110, in Phrom Phong. Open daily 08:00 to 22:00."),
+        ],
+        wa_text="Hi KROSS PARK, I saw your ad and would like to book the pickleball court.",
+    ),
+    "classes": dict(
+        title="Coached Group Classes in Phrom Phong | KROSS PARK Bangkok",
+        desc="Group fitness classes on a rooftop in Phrom Phong, Bangkok. HYROX, strength, StrongHer, mobility and recovery, 13 formats run by professional coaches. Single class ฿700, unlimited from ฿4,000 a month.",
+        eyebrow="Group classes · Phrom Phong, Bangkok",
+        h1="Coached classes on a Bangkok rooftop",
+        lead="13 formats, from HYROX prep and barbell strength to mobility and recovery, every one run by a professional coach. Drop in for a single class or join the Club for unlimited training.",
+        image="hero-poster.jpg",
+        alt="KROSS PARK rooftop training ground above Phrom Phong, Bangkok",
+        meta=["HYROX", "Strength", "StrongHer", "Mobility & recovery"],
+        proof=[
+            ("13 formats", "HYROX, strength, StrongHer, movement, recovery."),
+            ("Pro coaches", "Every class is coached, not just supervised."),
+            ("From ฿350 / class", "Packs of 10, 20 or 30, or unlimited from ฿4,000 a month."),
+        ],
+        rates_title="Classes & membership",
+        rates=[
+            ("Single class", "฿700"),
+            ("Starter pack, 10 classes", "฿4,500"),
+            ("Essential pack, 20 classes", "฿8,000"),
+            ("Signature pack, 30 classes", "฿10,500"),
+            ("Club membership, unlimited classes", "฿5,000 / month"),
+            ("Club membership, quarterly", "฿14,000"),
+            ("Club membership, annual", "฿48,000"),
+        ],
+        book_note="Message us on LINE or WhatsApp with your goal and we book your first class. Classes also live on the KROSS App.",
+        secondary=("wa", "WhatsApp"),
+        faq=[
+            ("Which class should I start with?", "Tell us your goal on LINE or WhatsApp and we point you to the right format. Start on Hyrox is the entry point to HYROX training, Barbell Club and Power Lab cover strength, and StrongHer 40+ and StrongHer Elevate are strength programs built for women."),
+            ("What does membership include?", "Unlimited classes, plus every month two ice bath sessions, one pickleball session, one free event, and 20% off merchandise and drinks."),
+            ("When are the classes?", "The timetable lives in the KROSS App and our WhatsApp Community. Message us and we send you this week's schedule."),
+            ("Where are you?", "5/9 Soi Phrom Si 1, Khlong Tan Nuea, Watthana, Bangkok 10110, in Phrom Phong. Open daily 08:00 to 22:00."),
+        ],
+        wa_text="Hi KROSS PARK, I saw your ad and would like to book my first class.",
+    ),
+    "training": dict(
+        title="Personal Trainer in Phrom Phong | KROSS PARK Bangkok",
+        desc="Personal training in Phrom Phong, Bangkok. 1:1 or duo sessions in a private indoor studio, with a rooftop strength park and ice bath. ฿2,200 per session, assessment included. Packages from ฿1,666 per session.",
+        eyebrow="Personal training · Phrom Phong, Bangkok",
+        h1="Your coach. Your plan. Your rooftop.",
+        lead="1:1 personal training in a private indoor studio in Phrom Phong, with an outdoor strength park and an ice bath upstairs when your program calls for them. Every journey starts with an assessment.",
+        image="studio.jpg",
+        alt="Personal training session in the KROSS PARK indoor studio",
+        meta=["Indoor studio", "1:1 or duo", "Strength park", "Ice bath"],
+        proof=[
+            ("Assessment first", "Your coach maps where you are before writing the plan."),
+            ("1:1 or duo", "Two people maximum. Focused sessions, no crowds."),
+            ("From ฿1,666 / session", "Packages of 10, 20 or 30 sessions."),
+        ],
+        rates_title="Sessions & packages",
+        rates=[
+            ("1:1 session, 60 minutes", "฿2,200"),
+            ("Duo session, 2 people", "฿3,000 total"),
+            ("Starter, 10 sessions", "฿20,000"),
+            ("Essential, 20 sessions", "฿36,000"),
+            ("Signature, 30 sessions", "฿50,000"),
+        ],
+        book_note="Message us on LINE or WhatsApp and we book your assessment with a coach.",
+        secondary=("wa", "WhatsApp"),
+        faq=[
+            ("What happens in the first session?", "An assessment. Your coach looks at how you move, where your strength is and what you want, then builds the program. It is included in your first 1:1 session."),
+            ("What can I train for?", "Strength, fat loss, HYROX prep, return from injury, sport specific work. Whatever the goal, it gets a plan."),
+            ("Can I train with a friend?", "Yes. Duo sessions are ฿3,000 for two people. Groups of three or more on request."),
+            ("Where are you?", "5/9 Soi Phrom Si 1, Khlong Tan Nuea, Watthana, Bangkok 10110, in Phrom Phong. Open daily 08:00 to 22:00."),
+        ],
+        wa_text="Hi KROSS PARK, I saw your ad and would like to book a personal training assessment.",
+    ),
+}
+
+
+def landing(slug, c):
+    url = f"https://krosspark.club/go/{slug}"
+    wa = f"https://wa.me/{WA_NUMBER}?text=" + urllib.parse.quote(c["wa_text"])
+    sec_href, sec_label = c["secondary"]
+    meta = "".join(f"<div>{m}</div>" for m in c["meta"])
+    proof = "".join(f"<div><strong>{a}</strong><span>{b}</span></div>" for a, b in c["proof"])
+    rates = "".join(f"<tr><td><strong>{a}</strong></td><td>{b}</td></tr>" for a, b in c["rates"])
+    faq = "".join(f"<details><summary>{q}</summary><p>{a}</p></details>" for q, a in c["faq"])
+    line_btn = f'<a class="btn btn-solid wa-btn" href="{LINE_URL}" target="_blank" rel="noopener">{LINE_ICON}Chat on LINE</a>'
+    wa_outline = f'<a class="btn btn-outline wa-btn" href="{wa}" target="_blank" rel="noopener">{WA_ICON}WhatsApp</a>'
+    sec_btn = wa_outline if sec_href == "wa" else f'<a class="btn btn-outline" href="{sec_href}">{sec_label}</a>'
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{c["title"]}</title>
+<meta name="description" content="{c["desc"]}">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="{url}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="KROSS PARK">
+<meta property="og:title" content="{c["title"]}">
+<meta property="og:description" content="{c["desc"]}">
+<meta property="og:url" content="{url}">
+<meta property="og:image" content="https://krosspark.club/assets/img/og-image.jpg">
+{ICONS.replace('href="assets/', 'href="/assets/')}
+{ga_head()}
+<link rel="stylesheet" href="/assets/styles.css?v={CSS_VER}">
+</head>
+<body class="landing">
+
+<header class="lp-header">
+  <nav class="nav">
+    <a class="logo" href="/"><img src="/assets/img/logo-white.png" alt="KROSS PARK"></a>
+    <a class="nav-cta" href="{LINE_URL}" target="_blank" rel="noopener">{LINE_ICON}LINE</a>
+  </nav>
+</header>
+
+<section class="hero lp-hero">
+  <div class="hero-media"><img src="/assets/img/{c["image"]}" alt="{c["alt"]}"></div>
+  <div class="hero-overlay"></div>
+  <div class="wrap hero-inner">
+    <span class="eyebrow">{c["eyebrow"]}</span>
+    <h1>{c["h1"]}</h1>
+    <p class="lead">{c["lead"]}</p>
+    <div class="hero-ctas">
+      {line_btn}
+      {sec_btn}
+    </div>
+    <div class="hero-meta courtline light">{meta}</div>
+  </div>
+</section>
+
+<section class="section section-sage">
+  <div class="wrap">
+    <div class="proof reveal">{proof}</div>
+  </div>
+</section>
+
+<section class="section" id="book">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Rates</span>
+      <h2>{c["rates_title"]}</h2>
+    </div>
+    <div class="reveal">
+      <div class="table-scroll"><table class="rates">
+        <tr><th>Item</th><th>Price</th></tr>
+        {rates}
+      </table></div>
+      <p style="margin-top:18px; font-size:.95rem">{c["book_note"]}</p>
+      <div class="hero-ctas" style="margin-top:22px">
+        <a class="btn btn-green wa-btn" href="{LINE_URL}" target="_blank" rel="noopener">{LINE_ICON}Chat on LINE</a>
+        <a class="btn btn-outline dark-context wa-btn" href="{wa}" target="_blank" rel="noopener">{WA_ICON}WhatsApp</a>
+      </div>
+      <div style="margin-top:22px">{STORE_BTNS}</div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-sage">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="eyebrow">Good to know</span>
+      <h2>Questions</h2>
+    </div>
+    <div class="faq reveal">{faq}</div>
+  </div>
+</section>
+
+<section class="section section-green on-dark">
+  <div class="wrap cta-band reveal">
+    <span class="eyebrow">Find us</span>
+    <h2 style="margin-top:14px">Rooftop, Phrom Phong</h2>
+    <p class="lead" style="margin-top:16px; color:rgba(255,255,255,.85)">5/9 Soi Phrom Si 1, Khlong Tan Nuea, Watthana, Bangkok 10110. Open daily 08:00 to 22:00.</p>
+    <div class="hero-ctas">
+      {line_btn}
+      <a class="btn btn-outline" href="{MAPS_URL}" target="_blank" rel="noopener">Open in Google Maps</a>
+    </div>
+  </div>
+</section>
+
+<footer class="lp-footer">
+  <div class="wrap">
+    <span>© 2026 KROSS PARK. Part of the KROSS family.</span>
+    <span><a href="/">Full site</a> · <a href="/privacy">Privacy</a> · <a href="https://wa.me/{WA_NUMBER}" target="_blank" rel="noopener">WhatsApp +66 92 572 6448</a></span>
+  </div>
+</footer>
+
+<div class="lp-sticky">
+  {line_btn}
+  {wa_outline}
+</div>
+
+<script>
+if (typeof gtag === 'function') gtag('event', 'landing_view', {{campaign: '{slug}'}});
+const io = new IntersectionObserver(es => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), {{threshold:.12}});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+{track_js()}
+</script>
+</body>
+</html>
+"""
+
+
+def clean_links(html):
+    """Internal links are written as page.html; the server serves clean URLs, so emit those."""
+    html = re.sub(r'href="index\.html(#[^"]*)?"', lambda m: f'href="/{m.group(1) or ""}"', html)
+    return re.sub(r'href="([a-z0-9-]+)\.html(#[^"]*)?"', lambda m: f'href="/{m.group(1)}{m.group(2) or ""}"', html)
+
+
 for page, (label, title) in PAGES.items():
     desc = {
         "index.html": "Rooftop fitness and pickleball in Phrom Phong, Bangkok. Pickleball court, open gym, group classes, 1:1 personal training and an ice bath.",
@@ -825,7 +1171,16 @@ for page, (label, title) in PAGES.items():
         "training.html": "Personal training in Phrom Phong, Bangkok. 1:1 or duo sessions in a dedicated indoor studio, assessment based coaching, plus open gym sessions.",
         "events.html": "Hire a rooftop venue in the heart of Bangkok. KROSS PARK is available for brand activations, corporate wellness, tournaments and shoots.",
         "contact.html": "Contact KROSS PARK Bangkok via LINE, WhatsApp or enquiry form. 5/9 Soi Phrom Si 1, Khlong Tan Nuea, Watthana, Bangkok 10110.",
+        "privacy.html": "How KROSS PARK handles the data you share on krosspark.club: enquiry form, analytics and advertising cookies, and your rights.",
+        "thanks.html": "Your message to KROSS PARK has been received.",
+        "404.html": "That page does not exist on krosspark.club.",
     }[page]
-    html = shell(page, title, BODIES[page], desc)
-    pathlib.Path(page).write_text(html, encoding="utf-8", newline="\n")
+    html = clean_links(shell(page, title, BODIES[page], desc))
+    (HERE / page).write_text(html, encoding="utf-8", newline="\n")
     print(f"wrote {page} ({len(html)} bytes)")
+
+(HERE / "go").mkdir(exist_ok=True)
+for slug, cfg in LANDINGS.items():
+    html = clean_links(landing(slug, cfg))
+    (HERE / "go" / f"{slug}.html").write_text(html, encoding="utf-8", newline="\n")
+    print(f"wrote go/{slug}.html ({len(html)} bytes)")
